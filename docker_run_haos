@@ -1,0 +1,35 @@
+docker run -d --name="influxdb-docker" \
+        --domainname local.hass.io \
+        --dns=172.30.32.3 --dns-option=timeout:10 --dns-search=local.hass.io \
+        --restart=always \
+        --net=hassio \
+        --hostname influxdb-docker \
+        --add-host "hassio:172.30.32.2" \
+        --add-host "supervisor:172.30.32.2" \
+        -p 0.0.0.0:8086:8086 \
+        -v /mnt/data/supervisor/media/storage1000gb/addonsdata/a0d7b954-influxdb/influxdb:/var/lib/influxdb \
+        docker.io/library/influxdb:1.11.8
+---
+docker run -d --name="chronograf-docker" \
+        --domainname local.hass.io \
+        --dns=172.30.32.3 --dns-option=timeout:10 --dns-search=local.hass.io \
+        --restart=always \
+        --net=hassio \
+        --hostname chronograf-docker \
+        --add-host "hassio:172.30.32.2" \
+        --add-host "supervisor:172.30.32.2" \
+        -p 0.0.0.0:8888:8888 \
+        -v /mnt/data/supervisor/media/storage1000gb/addonsdata/a0d7b954-influxdb/chronograf:/var/lib/chronograf \
+        -e INFLUXDB_URL=http://172.30.32.1:8086 \
+        docker.io/library/chronograf:1.7.17
+---
+docker run -d --name="telegraf-docker" \                   
+        --domainname local.hass.io \
+        --dns=172.30.32.3 --dns-option=timeout:10 --dns-search=local.hass.io \
+        --restart=always \
+        --net=hassio \
+        --hostname telegraf-docker \
+        --add-host "hassio:172.30.32.2" \
+        --add-host "supervisor:172.30.32.2" \
+        -v /mnt/data/supervisor/media/storage1000gb/addonsdata/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro \
+        telegraf:1.33.3
